@@ -26,7 +26,7 @@ local playerCollisionFilter = { categoryBits=16, maskBits=1 } --collision avec v
 local chenille = {}
 local champignon ={}
 local champ={}
-local chenilleCount = 15
+local chenilleCount = 10
 local chenilleHeight = 20
 local color1 = { 1, 0, 0.5 }
 local nbtouche = 0
@@ -88,23 +88,24 @@ local function wallCollision( event )
 						 		 						end
 
 						 		 				end
-
 					 		 				end,
 					 		 			 1)
 						
 		 		 event.target:setLinearVelocity(event.target.speed, 0 )
-		 		 event.target.speed = - event.target.speed
+		 		event.target.speed = - event.target.speed
 		 		 return true
 		 		
 			end
 
 			 if event.other.type == 'bullet' and event.target.type=="champ" then
-			 		print (event.target.type)
+			 		
 			 			--suppression de la balle
 		            display.remove( event.other )
 		           event.other = nil
 
-				local seq_explosion ={
+		           if event.target.pv <= 1 then 
+
+						local seq_explosion ={
 													{
 											        name = "explosionChampignon",
 											        start = 1,
@@ -114,19 +115,26 @@ local function wallCollision( event )
 											        
 											    }
 											}
-					local explosion_champignon = display.newSprite( img_explosion, seq_explosion)
-					explosion_champignon.x = event.target.x
-					explosion_champignon.y = event.target.y
-					explosion_champignon:play()
-		           --suppression du champignon
-		           display.remove(event.target)
-		           event.target=nil
-		           return true
-
+						local explosion_champignon = display.newSprite( img_explosion, seq_explosion)
+						explosion_champignon.x = event.target.x
+						explosion_champignon.y = event.target.y
+						explosion_champignon:play()
+			           --suppression du champignon
+			           display.remove(event.target)
+			           event.target=nil
+			           
+			        else
+			        	event.target.pv = event.target.pv - 1
+			        	event.target:setFillColor(0.9,0.8,0.8)
+			        	
+			       end
+			       return true
 			 end
 
 		    if event.other.type == 'bullet' and event.target.type=="ver" then
-		        	
+		        	print (event.target.speed)
+		        	local vx, vy = event.target:getLinearVelocity()
+		        	print ("velocity "..vx)
 					nbtouche = nbtouche + 1	        	
 		        	--suppression de la balle
 		            display.remove( event.other )
@@ -178,7 +186,18 @@ local function wallCollision( event )
     	--print ("other "..event.other.type .. " target "..event.target.type)
     	if event.target.type=="ver" then
     		event.target:setLinearVelocity(-event.target.speed, 0 )
-				
+				if event.target.x < 20 then
+					event.target:setLinearVelocity(event.target.speed, 0 )
+				end
+				--gestiin du ver bloque 
+				--local vx, vy = myRect:getLinearVelocity()
+			local vx, vy = event.target:getLinearVelocity()
+			if vx == 0 then
+				print ("OOOOOOOOOOOOOOOOOO")
+			end
+		    if vx ~= -event.target.speed then
+		    	event.target:setLinearVelocity(-100, 0 )
+		    end
     	 end   
 
     	  if event.other.type == "player"  then
@@ -282,11 +301,11 @@ function scene:create( event )
 	--vaisseau.anchorY = 0
 	--vaisseau.x = contentW * 0.5
 	--vaisseau.y = display.viewableContentHeight - 50
-	physics.addBody(vaisseau, "static",{ bounce=0.8, filter=playerCollisionFilter})
+	physics.addBody(vaisseau, "static",{  filter=playerCollisionFilter})
 	sceneGroup:insert(vaisseau)    
 
 	mur_g = display.newRect( 10, 0, 50, 3000)
-	physics.addBody( mur_g, "static",{ bounce=0.8, filter=murCollisionFilter })
+	physics.addBody( mur_g, "static",{  filter=murCollisionFilter })
  	mur_g.isSensor = true
  	mur_g.type="wall"
  	mur_g.myName="mur"
@@ -294,7 +313,7 @@ function scene:create( event )
 	sceneGroup:insert(mur_g) 
 
 	mur_d = display.newRect( contentW-10,0, 50, 3000)
-	physics.addBody( mur_d, "static",{ bounce=0.8, filter=murCollisionFilter })
+	physics.addBody( mur_d, "static",{ filter=murCollisionFilter })
 	 mur_d.isSensor = true
 	 mur_d.type="wall"
 	sceneGroup:insert(mur_d) 
