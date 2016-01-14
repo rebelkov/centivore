@@ -80,19 +80,30 @@ local function wallCollision( event )
 			if event.other.type == 'wall' or event.other.type=="champ" then
 		 		 --display.remove( event.other )
 		 		 --print(event.target.myName)
-		 		 timer.performWithDelay(10, function() 
-						 		 				if event.target.y~=nil and vaisseau.y ~= nil then
-						 		 						event.target.y=event.target.y + chenilleHeight*2.5 
-						 		 						if event.target.y > vaisseau.y + chenilleHeight*2.5 then 
-						 		 							event.target.y = vaisseau.y
-						 		 						end
 
-						 		 				end
-					 		 				end,
-					 		 			 1)
+
+		 		 -- timer.performWithDelay(10, function() 
+						--  		 				if event.target.y~=nil and vaisseau.y ~= nil then
+						--  		 						event.target.y=event.target.y + chenilleHeight*2.5 
+						--  		 						if event.target.y > vaisseau.y + chenilleHeight*2.5 then 
+						--  		 							event.target.y = vaisseau.y
+					
+						--  		 						end
+
+						--  		 				end
+					 -- 		 				end,
+					 -- 		 			 1)
 						
+
+
+		 		 local vx, vy = event.target:getLinearVelocity()
+		        print ("velocity "..vx)
+		        --event.target.speed=-vx
 		 		 event.target:setLinearVelocity(event.target.speed, 0 )
-		 		event.target.speed = - event.target.speed
+		 		 event.target.speed = vx
+		 		 --vx=event.target:getLinearVelocity()
+		 		 --print ("after set velocity "..vx)
+		 		-- event.target.speed = - event.target.speed
 		 		 return true
 		 		
 			end
@@ -132,9 +143,7 @@ local function wallCollision( event )
 			 end
 
 		    if event.other.type == 'bullet' and event.target.type=="ver" then
-		        	print (event.target.speed)
-		        	local vx, vy = event.target:getLinearVelocity()
-		        	print ("velocity "..vx)
+		        	
 					nbtouche = nbtouche + 1	        	
 		        	--suppression de la balle
 		            display.remove( event.other )
@@ -327,6 +336,7 @@ function scene:create( event )
 
 		physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
 		chenille[i].gravityScale = 0
+		chenille[i].alpha = 1
 		chenille[i].numero = i
 		chenille[i].speed = speed
 		chenille[i].type="ver"
