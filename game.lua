@@ -26,7 +26,7 @@ local playerCollisionFilter = { categoryBits=16, maskBits=1 } --collision avec v
 local chenille = {}
 local champignon ={}
 local champ={}
-local chenilleCount = 10
+local chenilleCount = 2
 local chenilleHeight = 20
 local color1 = { 1, 0, 0.5 }
 local nbtouche = 0
@@ -82,31 +82,38 @@ local function wallCollision( event )
 		 		 --print(event.target.myName)
 
 
-		 		 -- timer.performWithDelay(10, function() 
-						--  		 				if event.target.y~=nil and vaisseau.y ~= nil then
-						--  		 						event.target.y=event.target.y + chenilleHeight*2.5 
-						--  		 						if event.target.y > vaisseau.y + chenilleHeight*2.5 then 
-						--  		 							event.target.y = vaisseau.y
-					
-						--  		 						end
-
-						--  		 				end
-					 -- 		 				end,
-					 -- 		 			 1)
-						
+		 		 
 
 
 		 		 local vx, vy = event.target:getLinearVelocity()
-		        print ("velocity "..vx)
+		        print ("velocity "..vx.. vy)
 		        --event.target.speed=-vx
-		 		 event.target:setLinearVelocity(event.target.speed, 0 )
+		        if vx < 0 then vx=-200
+		        	else vx =200
+		        end
+		        local d=event.target.delai
+
+
+		 		 event.target:setLinearVelocity(-vx, vy )
 		 		 event.target.speed = vx
 		 		 --vx=event.target:getLinearVelocity()
 		 		 --print ("after set velocity "..vx)
 		 		-- event.target.speed = - event.target.speed
+		 		timer.performWithDelay(10, function() 
+						 		 				if event.target.y~=nil and vaisseau.y ~= nil then
+						 		 						event.target.y=event.target.y + chenilleHeight*2.5 
+						 		 						if event.target.y > vaisseau.y + chenilleHeight*2.5 then 
+						 		 							event.target.y = vaisseau.y
+					
+						 		 						end
+
+						 		 				end
+					 		 				end,
+					 		 			 1)
 		 		 return true
 		 		
 			end
+
 
 			 if event.other.type == 'bullet' and event.target.type=="champ" then
 			 		
@@ -192,21 +199,12 @@ local function wallCollision( event )
 	
     elseif event.phase == "ended" then
     
+    
+						
     	--print ("other "..event.other.type .. " target "..event.target.type)
     	if event.target.type=="ver" then
-    		event.target:setLinearVelocity(-event.target.speed, 0 )
-				if event.target.x < 20 then
-					event.target:setLinearVelocity(event.target.speed, 0 )
-				end
-				--gestiin du ver bloque 
-				--local vx, vy = myRect:getLinearVelocity()
-			local vx, vy = event.target:getLinearVelocity()
-			if vx == 0 then
-				print ("OOOOOOOOOOOOOOOOOO")
-			end
-		    if vx ~= -event.target.speed then
-		    	event.target:setLinearVelocity(-100, 0 )
-		    end
+    		
+			
     	 end   
 
     	  if event.other.type == "player"  then
@@ -314,7 +312,7 @@ function scene:create( event )
 	sceneGroup:insert(vaisseau)    
 
 	mur_g = display.newRect( 10, 0, 50, 3000)
-	physics.addBody( mur_g, "static",{  filter=murCollisionFilter })
+	physics.addBody( mur_g, "static",{ bounce=0, friction=0,filter=murCollisionFilter })
  	mur_g.isSensor = true
  	mur_g.type="wall"
  	mur_g.myName="mur"
@@ -322,23 +320,24 @@ function scene:create( event )
 	sceneGroup:insert(mur_g) 
 
 	mur_d = display.newRect( contentW-10,0, 50, 3000)
-	physics.addBody( mur_d, "static",{ filter=murCollisionFilter })
+	physics.addBody( mur_d, "static",{bounce=0, friction=0,filter=murCollisionFilter })
 	 mur_d.isSensor = true
 	 mur_d.type="wall"
 	sceneGroup:insert(mur_d) 
    
   
 	for i = 1, chenilleCount do
-		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, 150,  chenilleHeight )
+		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.5*i), 150,  chenilleHeight )
 		if i == 1 then 
 			chenille[i].fill = color1
 		end
 
-		physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
+		physics.addBody( chenille[i] , "dynamic",{bounce=0,friction=0,filter=verCollisionFilter})
 		chenille[i].gravityScale = 0
 		chenille[i].alpha = 1
 		chenille[i].numero = i
 		chenille[i].speed = speed
+		chenille[i].delai = 0
 		chenille[i].type="ver"
 		chenille[i]:setLinearVelocity( -chenille[i].speed, 0 )
 	
