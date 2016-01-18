@@ -1,5 +1,3 @@
-
-
 local composer = require( "composer" )
 local mydata = require( "mydata" )
 
@@ -26,11 +24,11 @@ local playerCollisionFilter = { categoryBits=16, maskBits=1 } --collision avec v
 local chenille = {}
 local champignon ={}
 local champ={}
-local chenilleCount = 2
-local chenilleHeight = 20
+local chenilleCount = 10
+local chenilleHeight = 15
 local color1 = { 1, 0, 0.5 }
 local nbtouche = 0
-
+local bomb
 local explosionOptions =		{
 							    width = 64,
 							    height = 64,
@@ -41,7 +39,7 @@ local img_explosion = graphics.newImageSheet( "explosions.png", explosionOptions
 local function shoot( event )
     if event.phase == 'began' and vaisseau.width ~= nil then
         
-        bullet = display.newRect(vaisseau.x + vaisseau.width * 0.5, vaisseau.y, 10, 30 )
+        bullet = display.newRect(vaisseau.x , vaisseau.y, 10, 30 )
         physics.addBody( bullet, 'dynamic',{filter=shootCollisionFilter} )
         bullet.gravityScale = 0
         bullet.isSensor = true
@@ -79,51 +77,63 @@ local function wallCollision( event )
     			  
 			if event.other.type == 'wall' or event.other.type=="champ" then
 		 		 --display.remove( event.other )
-		 		 --print(event.target.myName)
 
+		 		 if event.other.type == "champ" then
+		 		 	local num=event.other.numero
+		 		 	print("numero champignon "..num)
 
-		 		 
+		 		 	
+		 		 	champ[num].pv = champ[num].pv + 1
+		 		 	if champ[num].pv  >= 2 then
+		 		 			
+		 		 		event.other:setFillColor( 0.1, 0.1,0.3  )
+		 		 	end
+		 		 	if champ[num].pv > 5 then
+		 		 		print(" chute "..num)
+		 		 			--event.other.gravityScale = 2
+		 		 			
+		 		 			--objet qui tombe
+		 		 			local b_x=event.other.x
+		 		 			local b_y=event.other.y
+		 		 			 timer.performWithDelay(1, function() 
+						 		 				bomb=display.newImageRect( "champignon.png" , 40, 40 )
+						 		 				bomb.gravityScale = 3
+						 		 				bomb.x = b_x
+						 		 				bomb.y= b_y 
+						 		 				physics.addBody( bomb, 'dynamic',{bounce=0.6,friction=0})
+					 		 				end,
+					 		 			 1)
 
+		 		 			 display.remove(event.other)
+		 		 			event.other=nil
 
-		 		 local vx, vy = event.target:getLinearVelocity()
-		        print ("velocity "..vx.. vy)
-		        --event.target.speed=-vx
-		        if vx < 0 then vx=-200
-		        	else vx =200
-		        end
-		        local d=event.target.delai
-
-
-		 		 event.target:setLinearVelocity(-vx, vy )
-		 		 event.target.speed = vx
-		 		 --vx=event.target:getLinearVelocity()
-		 		 --print ("after set velocity "..vx)
-		 		-- event.target.speed = - event.target.speed
-		 		timer.performWithDelay(10, function() 
+		 		 	end
+		 		 end
+		 		 timer.performWithDelay(1, function() 
 						 		 				if event.target.y~=nil and vaisseau.y ~= nil then
 						 		 						event.target.y=event.target.y + chenilleHeight*2.5 
 						 		 						if event.target.y > vaisseau.y + chenilleHeight*2.5 then 
 						 		 							event.target.y = vaisseau.y
-					
 						 		 						end
 
 						 		 				end
 					 		 				end,
 					 		 			 1)
+						
+		 		 event.target:setLinearVelocity(event.target.speed, 0 )
+		 		 event.target.speed = - event.target.speed
 		 		 return true
 		 		
 			end
+			
+			if event.other.type == 'bullet' and event.target.type=="champ" then
 
+				--suppression de la balle
+		        display.remove( event.other )
+		        event.other = nil
 
-			 if event.other.type == 'bullet' and event.target.type=="champ" then
-			 		
-			 			--suppression de la balle
-		            display.remove( event.other )
-		           event.other = nil
-
-		           if event.target.pv <= 1 then 
-
-						local seq_explosion ={
+		        
+		        local seq_explosion_champ ={
 													{
 											        name = "explosionChampignon",
 											        start = 1,
@@ -133,24 +143,23 @@ local function wallCollision( event )
 											        
 											    }
 											}
-						local explosion_champignon = display.newSprite( img_explosion, seq_explosion)
-						explosion_champignon.x = event.target.x
-						explosion_champignon.y = event.target.y
-						explosion_champignon:play()
-			           --suppression du champignon
-			           display.remove(event.target)
-			           event.target=nil
-			           
-			        else
-			        	event.target.pv = event.target.pv - 1
-			        	event.target:setFillColor(0.9,0.8,0.8)
-			        	
-			       end
-			       return true
-			 end
+					local explosion_champignon = display.newSprite( img_explosion, seq_explosion_champ)
+					explosion_champignon.x = event.target.x
+					explosion_champignon.y = event.target.y
+					explosion_champignon:play()
+
+				display.remove(event.target)
+				event.target= nil
+
+
+				return true					
+
+			end
+			
 
 		    if event.other.type == 'bullet' and event.target.type=="ver" then
 		        	
+		        
 					nbtouche = nbtouche + 1	        	
 		        	--suppression de la balle
 		            display.remove( event.other )
@@ -199,12 +208,21 @@ local function wallCollision( event )
 	
     elseif event.phase == "ended" then
     
-    
-						
     	--print ("other "..event.other.type .. " target "..event.target.type)
     	if event.target.type=="ver" then
-    		
-			
+    		event.target:setLinearVelocity(-event.target.speed, 0 )
+				if event.target.x < 20 then
+					event.target:setLinearVelocity(event.target.speed, 0 )
+				end
+				--gestiin du ver bloque 
+				--local vx, vy = myRect:getLinearVelocity()
+			local vx, vy = event.target:getLinearVelocity()
+			if vx == 0 then
+				print ("OOOOOOOOOOOOOOOOOO")
+			end
+		    if vx ~= -event.target.speed then
+		    	event.target:setLinearVelocity(-100, 0 )
+		    end
     	 end   
 
     	  if event.other.type == "player"  then
@@ -215,8 +233,8 @@ local function wallCollision( event )
 							    height = 125,
 							    numFrames = 14
 							}
-					local sheet_explosion = graphics.newImageSheet( "explosion_player.png", sheetOptions )
-					local sequences_explosion ={
+				local sheet_explosion = graphics.newImageSheet( "explosion_player.png", sheetOptions )
+				local sequences_explosion ={
 													{
 											        name = "normalExplosion",
 											        start = 1,
@@ -226,11 +244,11 @@ local function wallCollision( event )
 											        
 											    }
 											}
-					local explosion_player = display.newSprite( sheet_explosion, sequences_explosion)
-					explosion_player.x = event.other.x
-					explosion_player.y = event.other.y
-					explosion_player:addEventListener( "sprite", spriteListener )
-					explosion_player:play()
+				local explosion_player = display.newSprite( sheet_explosion, sequences_explosion)
+				explosion_player.x = event.other.x
+				explosion_player.y = event.other.y
+				explosion_player:addEventListener( "sprite", spriteListener )
+				explosion_player:play()
 
     	  		event.other=nil
     	  		--composer.gotoScene( "restart" )
@@ -312,7 +330,7 @@ function scene:create( event )
 	sceneGroup:insert(vaisseau)    
 
 	mur_g = display.newRect( 10, 0, 50, 3000)
-	physics.addBody( mur_g, "static",{ bounce=0, friction=0,filter=murCollisionFilter })
+	physics.addBody( mur_g, "static",{  filter=murCollisionFilter })
  	mur_g.isSensor = true
  	mur_g.type="wall"
  	mur_g.myName="mur"
@@ -320,24 +338,22 @@ function scene:create( event )
 	sceneGroup:insert(mur_g) 
 
 	mur_d = display.newRect( contentW-10,0, 50, 3000)
-	physics.addBody( mur_d, "static",{bounce=0, friction=0,filter=murCollisionFilter })
+	physics.addBody( mur_d, "static",{ filter=murCollisionFilter })
 	 mur_d.isSensor = true
 	 mur_d.type="wall"
 	sceneGroup:insert(mur_d) 
    
   
 	for i = 1, chenilleCount do
-		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.5*i), 150,  chenilleHeight )
+		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, 150,  chenilleHeight )
 		if i == 1 then 
 			chenille[i].fill = color1
 		end
 
-		physics.addBody( chenille[i] , "dynamic",{bounce=0,friction=0,filter=verCollisionFilter})
+		physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
 		chenille[i].gravityScale = 0
-		chenille[i].alpha = 1
 		chenille[i].numero = i
 		chenille[i].speed = speed
-		chenille[i].delai = 0
 		chenille[i].type="ver"
 		chenille[i]:setLinearVelocity( -chenille[i].speed, 0 )
 	
@@ -351,6 +367,7 @@ function scene:create( event )
 	--champignon[i] =display.newRect( 0,0 , 20, 20 )
 	    champignon[i].pv = 1 
 	    champignon[i].type="champ"
+	    champignon[i].numero=i
 		champignon[i].alpha=0
 		physics.addBody (champignon[i], "static", {filter = champCollisionFilter})
 		sceneGroup:insert( champignon[i] ) 
@@ -368,6 +385,7 @@ function scene:create( event )
 		champ[i]:setFillColor( 0.1, 0.8, 0.9  )
 		champ[i].type="champ"
 		champ[i].pv = 2 
+		champ[i].numero=i
 		physics.addBody(champ[i], "static", {filter = champCollisionFilter})
 		sceneGroup:insert(champ[i])
 	end
@@ -389,31 +407,7 @@ function scene:show( event )
    local phase = event.phase
 
    if ( phase == "will" ) then
- --   	for i = 1, chenilleCount do
-	-- 	chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, 150,  chenilleHeight )
-	-- 	if i == 1 then 
-	-- 		chenille[i].fill = color1
-	-- 	end
-
-	-- 	physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
-	-- 	chenille[i].gravityScale = 0
-	-- 	chenille[i].numero = i
-	-- 	chenille[i].speed = speed
-	-- 	chenille[i].type="ver"
-	-- 	chenille[i]:setLinearVelocity( -chenille[i].speed, 0 )
-	
-	-- 	sceneGroup:insert(chenille[i]) 
-
-	-- 	--creation des objets chamigong cache en reserve
-	-- 	champignon[i] = display.newImageRect( "champignon" , 40, 40 )
-	-- 	champignon[i].x=0
-	-- 	champignon[i].y=0
-	-- 	champignon[i].type="champ"
-	-- 	champignon[i].alpha=0
-	-- 	physics.addBody (champignon[i], "static", {filter = champCollisionFilter})
-
-
-	-- end
+ 
       -- Called when the scene is still off screen (but is about to come on screen).
    elseif ( phase == "did" ) then
       -- Called when the scene is now on screen.
@@ -421,24 +415,24 @@ function scene:show( event )
       -- Example: start timers, begin animation, play audio, etc.
 	  
 	
-	vaisseau:addEventListener( 'touch', moveVaisseau )
-	vaisseau:addEventListener( 'collision', wallCollision )
+		vaisseau:addEventListener( 'touch', moveVaisseau )
+		vaisseau:addEventListener( 'collision', wallCollision )
 
-	--Runtime:addEventListener("enterFrame", moveVer)
-	Runtime:addEventListener( 'touch', shoot )
+		--Runtime:addEventListener("enterFrame", moveVer)
+		Runtime:addEventListener( 'touch', shoot )
 
-	--ver:addEventListener( 'collision', wallCollision )
-	for i = 1, #chenille do
-		chenille[i]:addEventListener( 'collision', wallCollision )
-		--chenille[i]:addEventListener( 'postCollision', afterCollision )
+		--ver:addEventListener( 'collision', wallCollision )
+		for i = 1, #chenille do
+			chenille[i]:addEventListener( 'collision', wallCollision )
+			champignon[i]:addEventListener( 'collision', wallCollision )
+			--chenille[i]:addEventListener( 'postCollision', afterCollision )
+		end
 
-	end
-
-	for i = 1, 20 do
-		champ[i]:addEventListener( 'collision', wallCollision )
-	end
---Runtime.addEventListener( 'collision', wallCollision )
-	
+		for i = 1, 20 do
+			champ[i]:addEventListener( 'collision', wallCollision )
+		end
+	--Runtime.addEventListener( 'collision', wallCollision )
+		
 	  
    end
 end
@@ -503,16 +497,3 @@ scene:addEventListener( "destroy", scene )
 ---------------------------------------------------------------------------------
 
 return scene
-
-
-
-
-
-
-
-
-
-
-
-
-
