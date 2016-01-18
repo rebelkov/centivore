@@ -17,4 +17,10 @@ application = {
          ["@2x"] = 1.3
       },
    },
+    license = {
+      google = {
+         key = "reallylonggooglelicensekeyhere",
+         policy = "serverManaged", 
+      },
+   },
 }
