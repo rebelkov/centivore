@@ -91,16 +91,21 @@ local function wallCollision( event )
 		 		 	if champ[num].pv > 5 then
 		 		 		print(" chute "..num)
 		 		 			--event.other.gravityScale = 2
-		 		 			display.remove(event.other)
-		 		 			event.other=nil
-		 		 			--objet qui tombe
 		 		 			
+		 		 			--objet qui tombe
+		 		 			local b_x=event.other.x
+		 		 			local b_y=event.other.y
 		 		 			 timer.performWithDelay(1, function() 
 						 		 				bomb=display.newImageRect( "champignon.png" , 40, 40 )
 						 		 				bomb.gravityScale = 3
-						 		 				physics.addBody( bomb, 'dynamic')
+						 		 				bomb.x = b_x
+						 		 				bomb.y= b_y 
+						 		 				physics.addBody( bomb, 'dynamic',{bounce=0.6,friction=0})
 					 		 				end,
 					 		 			 1)
+
+		 		 			 display.remove(event.other)
+		 		 			event.other=nil
 
 		 		 	end
 		 		 end
