@@ -20,7 +20,7 @@ local murCollisionFilter = { categoryBits=2, maskBits=1 } --collision avec ver(1
 local shootCollisionFilter = { categoryBits=4, maskBits=9 } --collision avec ver(1) et champignon 
 local champCollisionFilter = { categoryBits=8, maskBits=5 } --collision avec ver(1) et shoot
 local playerCollisionFilter = { categoryBits=16, maskBits=1 } --collision avec ver(1) 
-local bombCollisionFilter = {categoryBits=32, maskBits=16 } -- collision avec player(16)
+local bombCollisionFilter = {categoryBits=32, maskBits=16 } -- collision avec player(16) 
 
 local chenille = {}
 local champignon ={}

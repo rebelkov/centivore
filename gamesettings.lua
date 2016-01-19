@@ -55,21 +55,28 @@ function scene:create( event )
     -- setup a page background, really not that important though composer
     -- crashes out if there isn't a display object in the view.
     --
-    local background = display.newRect( 0, 0, 570, 360 )
+     local background = display.newImageRect("foret_bg.png",900,1500)
+    
     background.x = display.contentCenterX
     background.y = display.contentCenterY
     sceneGroup:insert(background)
 
     --local title = display.newBitmapText( titleOptions )
-    local title = display.newText("Centivore", 100, 32, native.systemFontBold, 32 )
-    title.x = display.contentCenterX 
-    title.y = 40
-    title:setFillColor( 0 )
+     local title = display.newText("Paramètres", 100, 32, native.systemFontBold, 64 )
+    title.x = display.contentCenterX
+    title.y = 80
+    title:setFillColor( 1 )
     sceneGroup:insert( title )
 
-    local soundLabel = display.newText("Sound Effects", 100, 32, native.systemFont, 18 )
+
+    local region=display.newRect( 0, 0, 400, 260)
+    region.x=display.contentCenterX
+    region.y=display.contentCenterY
+    sceneGroup:insert( region )
+
+    local soundLabel = display.newText("Sound Effects", 100, 40, native.systemFont, 18 )
     soundLabel.x = display.contentCenterX - 75
-    soundLabel.y = 130
+    soundLabel.y = display.contentHeight/2
     soundLabel:setFillColor( 0 )
     sceneGroup:insert( soundLabel )
 
@@ -83,9 +90,9 @@ function scene:create( event )
     soundOnOffSwitch.y = soundLabel.y
     sceneGroup:insert( soundOnOffSwitch )
 
-    local musicLabel = display.newText("Music", 100, 32, native.systemFont, 18 )
+    local musicLabel = display.newText("Music", 100, 40, native.systemFont, 18 )
     musicLabel.x = display.contentCenterX - 75
-    musicLabel.y = 180
+    musicLabel.y = soundLabel.y + soundLabel.height +20
     musicLabel:setFillColor( 0 )
     sceneGroup:insert( musicLabel )
 
