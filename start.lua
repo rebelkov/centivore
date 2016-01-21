@@ -60,7 +60,7 @@ function scene:create( event )
 	background.y = display.contentHeight
 	sceneGroup:insert(background)
 	
-	title = display.newImageRect("title.png",500,100)
+	title = display.newImageRect("default.png",500,100)
 	title.anchorX = 0.5
 	title.anchorY = 0.5
 	title.x = display.contentCenterX - 80

@@ -9,7 +9,7 @@ local score = require( "score" )
 function restartGame(event)
      if event.phase == "ended" then
 		saveScore()
-		composer.gotoScene("start")
+		composer.gotoScene("game")
      end
 end
 

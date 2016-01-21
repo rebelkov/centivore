@@ -15,6 +15,7 @@ local contentW, contentH = display.contentWidth, display.contentHeight
 local bullet
 local gameStarted = false
 local vaisseau
+local backplayer 
 local verCollisionFilter = { categoryBits=1, maskBits=30 } --collision avec mur(2) et shoot(4) et champignon (8) et player(16)
 local murCollisionFilter = { categoryBits=2, maskBits=1 } --collision avec ver(1) 
 local shootCollisionFilter = { categoryBits=4, maskBits=9 } --collision avec ver(1) et champignon 
@@ -38,8 +39,10 @@ local explosionOptions =		{
 local img_explosion = graphics.newImageSheet( "explosions.png", explosionOptions )
 
 local function shoot( event )
-    if event.phase == 'began' and vaisseau.width ~= nil then
-        
+
+	-- print ("shoot ")
+ --    if event.phase == 'began' and 
+       if  vaisseau.width ~= nil then
         bullet = display.newRect(vaisseau.x , vaisseau.y, 10, 30 )
         physics.addBody( bullet, 'dynamic',{filter=shootCollisionFilter} )
         bullet.gravityScale = 0
@@ -266,6 +269,7 @@ local function chenilleCollision( event )
 end
 
 local function moveVaisseau (event)
+	
 	 if event.phase == "began" then
 			-- begin focus
 			display.getCurrentStage():setFocus( vaisseau, event.id )
@@ -336,6 +340,10 @@ function scene:create( event )
 	--vaisseau.y = display.viewableContentHeight - 50
 	physics.addBody(vaisseau, "static",{  filter=playerCollisionFilter})
 	sceneGroup:insert(vaisseau)    
+
+	backplayer=display.newRect(contentW * 0.5,display.viewableContentHeight-50,50,50)
+	backplayer.alpha=0
+	sceneGroup:insert(backplayer)
 
 	mur_g = display.newRect( 10, 0, 50, 3000)
 	physics.addBody( mur_g, "static",{  filter=murCollisionFilter })
@@ -427,8 +435,8 @@ function scene:show( event )
 		vaisseau:addEventListener( 'touch', moveVaisseau )
 		vaisseau:addEventListener( 'collision', playerCollision )
 
-		--Runtime:addEventListener("enterFrame", moveVer)
-		Runtime:addEventListener( 'touch', shoot )
+		--Runtime:addEvebackplayerntListener("enterFrame", moveVer)
+		Runtime:addEventListener( 'tap', shoot )
 
 		--ver:addEventListener( 'collision', wallCollision )
 		for i = 1, #chenille do
@@ -459,7 +467,10 @@ function scene:hide( event )
 
 		
 
-		Runtime:removeEventListener( 'touch', shoot )
+		if vaisseau.width ~= nil then
+			vaisseau:removeEventListener( 'touch', shoot )
+		end
+		Runtime:removeEventListener( 'tap', shoot )
 		for i = 1, #chenille do
 			if chenille[i].speed ~= 0  then
 				chenille[i]:removeEventListener( 'collision', chenilleCollision )
@@ -485,7 +496,7 @@ function scene:destroy( event )
       -- Example: stop timers, stop animation, stop audio, etc.
 
 		vaisseau:removeEventListener( 'touch', moveVaisseau )
-		Runtime:removeEventListener( 'touch', shoot )
+		Runtime:removeEventListener( 'tap', shoot )
 		for i = 1, #chenille do
 			chenille[i]:removeEventListener( 'collision', chenilleCollision )
 		end
