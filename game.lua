@@ -17,11 +17,11 @@ local gameStarted = false
 local vaisseau
 local backplayer 
 local verCollisionFilter = { categoryBits=1, maskBits=30 } --collision avec mur(2) et shoot(4) et champignon (8) et player(16)
-local murCollisionFilter = { categoryBits=2, maskBits=1 } --collision avec ver(1) 
-local shootCollisionFilter = { categoryBits=4, maskBits=9 } --collision avec ver(1) et champignon 
-local champCollisionFilter = { categoryBits=8, maskBits=5 } --collision avec ver(1) et shoot
-local playerCollisionFilter = { categoryBits=16, maskBits=1 } --collision avec ver(1) 
-local bombCollisionFilter = {categoryBits=32, maskBits=16 } -- collision avec player(16) 
+local murCollisionFilter = { categoryBits=2, maskBits=33 } --collision avec ver(1) 
+local shootCollisionFilter = { categoryBits=4, maskBits=41 } --collision avec ver(1) et champignon (8) et bomb(32)
+local champCollisionFilter = { categoryBits=8, maskBits=37 } --collision avec ver(1) et shoot(4) et bomb(32)
+local playerCollisionFilter = { categoryBits=16, maskBits=33 } --collision avec ver(1) et bomb(32)
+local bombCollisionFilter = {categoryBits=32, maskBits=26 } -- collision avec player(16)  et champ(8)
 
 local chenille = {}
 local champignon ={}
@@ -78,8 +78,8 @@ end
 local function bombCollision (event)
 
   if event.phase == 'began' then
-  	print (event.other.type)
-  	print (event.target.type)
+  	print("bomb Collision ".. event.other.type.. " "..event.target.type)
+  
   end
 end
 
@@ -243,6 +243,10 @@ local function chenilleCollision( event )
  		 			--objet qui tombe
  		 			local b_x=event.other.x
  		 			local b_y=event.other.y
+ 		 			local sens_x
+ 		 			if event.target.speed >0 then sens_x=2
+ 		 				else sens_x=-2
+ 		 			end
  		 			 timer.performWithDelay(1, function() 
 				 		 				bomb=display.newImageRect( "champignon.png" , 40, 40 )
 										bomb.gravityScale = 3
@@ -250,7 +254,9 @@ local function chenilleCollision( event )
 										bomb:setFillColor(0.9,0,0)
 										bomb.x = b_x
 				 		 				bomb.y= b_y 
-				 		 				physics.addBody( bomb, 'dynamic',{bounce=0.6,friction=0})
+				 		 				physics.addBody( bomb, 'dynamic',{bounce=0.6,friction=0, filter = bombCollisionFilter})
+				 		 				bomb:applyForce(sens_x,2,bomb.x,bomb.y)
+				 		 				bomb.addEventListener('collision', bombCollision)
 			 		 				end,
 			 		 			 1)
 
@@ -347,15 +353,13 @@ function scene:create( event )
 
 	mur_g = display.newRect( 10, 0, 50, 3000)
 	physics.addBody( mur_g, "static",{  filter=murCollisionFilter })
- 	mur_g.isSensor = true
  	mur_g.type="wall"
- 	mur_g.myName="mur"
+ 	
 
 	sceneGroup:insert(mur_g) 
 
 	mur_d = display.newRect( contentW-10,0, 50, 3000)
 	physics.addBody( mur_d, "static",{ filter=murCollisionFilter })
-	 mur_d.isSensor = true
 	 mur_d.type="wall"
 	sceneGroup:insert(mur_d) 
    
