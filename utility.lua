@@ -54,12 +54,12 @@ end
 function M.saveTable(t, filename)
     local path = system.pathForFile( filename, system.DocumentsDirectory)
     local file = io.open(path, "w")
-    --print("in saveTable.  I think my table is....")
+    print("in saveTable.  I think my table is....")
     --M.print_r(t)
     if file then
         local contents = json.encode(t)
-        --print("json data is")
-        --print("*" .. contents .. "*")
+        print("json data is")
+        print("*" .. contents .. "*")
         file:write( contents )
         io.close( file )
         return true

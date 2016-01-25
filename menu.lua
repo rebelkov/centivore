@@ -65,43 +65,42 @@ function scene:create( event )
     local playButton = widget.newButton({
         id = "button1",
         label = "Jouer",
-
-
-labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
-
-
         width = 200,
         height = 64,
         font= native.systemFontBold,
-        fontsize= 24,
+        fontSize= 48,
         onEvent = handlePlayButtonEvent
     })
     playButton.x = display.contentCenterX
-    playButton.y = display.contentCenterY - 90
+    playButton.y = display.contentCenterY - 200
     sceneGroup:insert( playButton )
 
     -- Create the widget
     local settingsButton = widget.newButton({
         id = "button2",
-        label = "Settings",
+        label = "Paramètres",
         width = 100,
         height = 64,
+           font= native.systemFontBold,
+        fontSize= 48,
         onEvent = handleSettingsButtonEvent
     })
     settingsButton.x = display.contentCenterX
-    settingsButton.y = display.contentCenterY - 30
+    settingsButton.y = display.contentCenterY - 100
     sceneGroup:insert( settingsButton )
 
     -- Create the widget
     local helpButton = widget.newButton({
         id = "button3",
-        label = "Help",
+        label = "Aide",
         width = 100,
         height = 64,
+         font= native.systemFontBold,
+        fontSize= 48,
         onEvent = handleHelpButtonEvent
     })
     helpButton.x = display.contentCenterX
-    helpButton.y = display.contentCenterY + 30
+    helpButton.y = display.contentCenterY 
     sceneGroup:insert( helpButton )
 
     -- Create the widget
@@ -110,10 +109,12 @@ labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
         label = "Credits",
         width = 100,
         height = 64,
+         font= native.systemFontBold,
+        fontSize= 48,
         onEvent = handleCreditsButtonEvent
     })
     creditsButton.x = display.contentCenterX
-    creditsButton.y = display.contentCenterY + 90
+    creditsButton.y = display.contentCenterY + 100
     sceneGroup:insert( creditsButton )
 
 end

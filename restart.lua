@@ -3,12 +3,12 @@ local scene = composer.newScene()
 
 local mydata = require( "mydata" )
 local score = require( "score" )
-
+local utility = require( "utility" )
 -- background
 
 function restartGame(event)
      if event.phase == "ended" then
-		saveScore()
+		--saveScore()
 		composer.gotoScene("game")
      end
 end
@@ -28,21 +28,21 @@ function showGameOver()
 end
 
 function loadScore()
-    
-	local prevScore = score.load()
-	if prevScore ~= nil then
-		if prevScore <= mydata.score then
-			score.set(mydata.score)
-		else 
-			score.set(prevScore)
-		end
-	else 
-		score.set(mydata.score)
-	end
+	print ("load score "..mydata.levelScore)
+	print ("best score "..mydata.settings.bestScore)
+    score.set(mydata.settings.bestScore)
+    scoreText.text=mydata.levelScore
+  
 end
 
-function saveScore()
-	score.save()
+function saveRecord()
+	print ("score "..mydata.levelScore)
+	print ("best "..mydata.settings.bestScore)
+	if mydata.levelScore > mydata.settings.bestScore then
+		print("best score")
+		   mydata.settings.bestScore=mydata.levelScore
+		   utility.saveTable(mydata.settings, "settings.json")
+	end
 end
 
 ---------------------------------------------------------------------------------
@@ -92,26 +92,29 @@ function scene:create( event )
 	restart.alpha = 0
 	sceneGroup:insert(restart)
 	
-	scoreText = display.newText(mydata.score,display.contentCenterX + 110,
+	scoreText = display.newText(mydata.levelScore,display.contentCenterX + 110,
 	display.contentCenterY - 60, native.systemFont, 50)
 	scoreText:setFillColor(0,0,0)
 	scoreText.alpha = 0 
 	sceneGroup:insert(scoreText)
 	
+
 	bestText = score.init({
-	fontSize = 50,
-	font = "Helvetica",
-	x = display.contentCenterX + 70,
-	y = display.contentCenterY + 85,
-	maxDigits = 7,
-	leadingZeros = false,
-	filename = "scorefile.txt",
-	})
-	bestScore = score.get()
-	bestText.text = bestScore
+						fontSize = 50,
+						font = "Helvetica",
+						x = display.contentCenterX + 70,
+						y = display.contentCenterY + 85,
+						maxDigits = 7,
+						leadingZeros = false
+						})
+	
+	
+	bestText.text = mydata.settings.bestScore
 	bestText.alpha = 0
 	bestText:setFillColor(0,0,0)
 	sceneGroup:insert(bestText)
+
+	
 end
 
 -- "scene:show()"
@@ -129,8 +132,9 @@ function scene:show( event )
 	  composer.removeScene("game")
 	restart:addEventListener("touch", restartGame)
 	showGameOver()
-	--saveScore()
+	saveRecord()
 	loadScore()
+	mydata.levelScore = 0
 	  
    end
 end

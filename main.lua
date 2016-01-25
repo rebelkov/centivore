@@ -28,7 +28,7 @@ if myData.settings == nil then
 	myData.settings.currentLevel = 1
 	myData.settings.unlockedLevels = 20
     myData.settings.bestScore = 0
-	myData.settings.levels = {}
+	--myData.settings.levels = {}
 	utility.saveTable(myData.settings, "settings.json")
 end
 if myData.settings.bestScore == nil then
@@ -74,7 +74,7 @@ local function onKeyEvent( event )
 
     local phase = event.phase
     local keyName = event.keyName
-    print( event.phase, event.keyName )
+    -- print( event.phase, event.keyName )
 
     if ( "back" == keyName and phase == "up" ) then
         if ( composer.getCurrentSceneName() == "menu" ) then

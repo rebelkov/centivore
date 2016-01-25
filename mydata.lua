@@ -8,7 +8,11 @@ M.settings.unlockedLevels = 20
 M.settings.bestScore = 0
 M.settings.soundOn = true
 M.settings.musicOn = true
-M.settings.levels = {} 
+M.settings.levels = {
+	{numlevel=1,speed=200},
+	{numlevel=2,speed=400}
+} 
+
 -- levels data members:
 --      .stars -- Stars earned per level
 --      .score -- Score for the level

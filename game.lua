@@ -8,20 +8,22 @@ physics.start()
 --physics.setDrawMode( 'debug' )
 
 local player = require("player")
-
-local speed = 200
+print ("curret lee "..mydata.settings.currentLevel)
+--print("level "..mydata.settings.levels[1][1].speed)
+local speed = 400
 local motionx = -1
 local contentW, contentH = display.contentWidth, display.contentHeight
 local bullet
 local gameStarted = false
 local vaisseau
-local backplayer 
+local sol
 local verCollisionFilter = { categoryBits=1, maskBits=30 } --collision avec mur(2) et shoot(4) et champignon (8) et player(16)
 local murCollisionFilter = { categoryBits=2, maskBits=33 } --collision avec ver(1) 
 local shootCollisionFilter = { categoryBits=4, maskBits=41 } --collision avec ver(1) et champignon (8) et bomb(32)
 local champCollisionFilter = { categoryBits=8, maskBits=37 } --collision avec ver(1) et shoot(4) et bomb(32)
 local playerCollisionFilter = { categoryBits=16, maskBits=33 } --collision avec ver(1) et bomb(32)
-local bombCollisionFilter = {categoryBits=32, maskBits=26 } -- collision avec player(16)  et champ(8)
+local bombCollisionFilter = {categoryBits=32, maskBits=94 } -- collision avec player(16)  et champ(8) et mur(2) et shoot(4) + sol(64)
+local solCollisionFilter = {categoryBits=64, maskBits= 32 } -- collision avec bomb (32)
 
 local chenille = {}
 local champignon ={}
@@ -29,7 +31,7 @@ local champ={}
 local chenilleCount = 10
 local chenilleHeight = 15
 local color1 = { 1, 0, 0.5 }
-local nbtouche = 0
+local nbtouche = mydata.levelScore
 local bomb
 local explosionOptions =		{
 							    width = 64,
@@ -37,6 +39,17 @@ local explosionOptions =		{
 							    numFrames = 160
 							}
 local img_explosion = graphics.newImageSheet( "explosions.png", explosionOptions )
+local seq_explosion_champ ={	
+								{
+						        name = "explosionChampignon",
+						        start = 1,
+						        count = 32,
+						        time = 500,
+						        loopCount=1
+								 }
+							}
+local explosion_champignon = display.newSprite( img_explosion, seq_explosion_champ)
+
 
 local function shoot( event )
 
@@ -56,6 +69,30 @@ local function shoot( event )
     end
 end
 
+local function explosionChampignon(x,y)
+				
+					explosion_champignon.x = x
+					explosion_champignon.y = y
+					explosion_champignon:play()
+
+end
+
+local function explosionChenille(x,y)
+		local seq_explosion ={
+								{
+						        name = "explosionChenille",
+						        start = 72,
+						        count = 32,
+						        time = 500,
+						        loopCount=1
+						  	  }
+							}
+		local explosion_chenille = display.newSprite( img_explosion, seq_explosion)
+		explosion_chenille.x = x
+		explosion_chenille.y = y
+		explosion_chenille:play()
+end
+
 local function newChampignon (numtouche,new_x,new_y)
 	
     champignon[numtouche].x=new_x
@@ -70,7 +107,9 @@ local function spriteListener( event )
 
     if ( event.phase == "ended" ) then  
         thisSprite:pause()
-       composer.gotoScene( "restart" )
+        print("game over "..mydata.levelScore
+        	)
+        composer.gotoScene( "restart" )
     end
 end
 
@@ -78,8 +117,23 @@ end
 local function bombCollision (event)
 
   if event.phase == 'began' then
-  	print("bomb Collision ".. event.other.type.. " "..event.target.type)
-  
+		print("bomb Collision ".. event.other.type.. " "..event.target.type)
+  	 if event.other.type=="bullet" then
+  		print("bomb explosion ".. event.other.type.. " "..event.target.type)
+					-- explosion_champignon.x = event.target.x
+					-- explosion_champignon.y = event.target.y
+					-- explosion_champignon:play()
+					explosionChampignon(event.target.x,event.target.y)
+					display.remove(event.target)
+     				event.target=nil
+
+     end
+
+     if event.other.type=="sol" then
+     	display.remove(event.target)
+     	event.target=nil
+     	print("destruciton bomb")
+     end
   end
 end
 
@@ -87,7 +141,7 @@ end
 
 local function playerCollision (event)
 	if event.phase == 'began' then
-		print ("player Collision " .. event.other.type.. " "..event.target.type)
+		--print ("player Collision " .. event.other.type.. " "..event.target.type)
 		if event.target.type == "player"  then
     	  		display.remove(event.target)
     	  		
@@ -111,22 +165,10 @@ local function champCollision(event)
 		        display.remove( event.other )
 		        event.other = nil
 
-		        
-		        local seq_explosion_champ ={
-													{
-											        name = "explosionChampignon",
-											        start = 1,
-											        count = 32,
-											        time = 500,
-											        loopCount=1
-											        
-											    }
-											}
-					local explosion_champignon = display.newSprite( img_explosion, seq_explosion_champ)
-					explosion_champignon.x = event.target.x
-					explosion_champignon.y = event.target.y
-					explosion_champignon:play()
-
+					-- explosion_champignon.x = event.target.x
+					-- explosion_champignon.y = event.target.y
+					-- explosion_champignon:play()
+				explosionChampignon(event.target.x,event.target.y)
 				display.remove(event.target)
 				event.target= nil
 
@@ -138,6 +180,26 @@ local function champCollision(event)
 
 end
 
+local function createBomb( obj_x,obj_y,impact)
+			local b_x=obj_x
+			local b_y=obj_y
+			local sens_x = 2
+			if impact >0 then sens_x=2
+				else sens_x=-2
+			end
+
+			bomb=display.newImageRect( "champignon.png" , 40, 40 )
+			bomb.gravityScale = 3
+			bomb.type="bomb"
+			bomb:setFillColor(0.9,0,0)
+			bomb.x = b_x
+			bomb.y= b_y 
+			physics.addBody( bomb, 'dynamic',{bounce=0.6,friction=0, filter = bombCollisionFilter})
+			bomb:applyForce(sens_x,2,bomb.x,bomb.y)
+			bomb:addEventListener('collision', bombCollision)
+				 		 				
+	-- body
+end
 
 
 local function chenilleCollision( event )
@@ -166,7 +228,9 @@ local function chenilleCollision( event )
 			
 
 		    if event.other.type == 'bullet' then
-		        	
+		        	local numtouche=event.target.numero
+		            local new_x=event.target.x
+			  		local new_y=event.target.y
 		        
 					nbtouche = nbtouche + 1	        	
 		        	--suppression de la balle
@@ -174,27 +238,9 @@ local function chenilleCollision( event )
 		            event.other = nil
 
 		            -- explosion de la chenille en deux
-		            local numtouche=event.target.numero
-		            local new_x=event.target.x
-			  		local new_y=event.target.y
-
-			  		local seq_explosion ={
-													{
-											        name = "explosionChenille",
-											        start = 72,
-											        count = 32,
-											        time = 500,
-											        loopCount=1
-											        
-											    }
-											}
-					local explosion_chenille = display.newSprite( img_explosion, seq_explosion)
-					explosion_chenille.x = new_x
-					explosion_chenille.y = new_y
-					explosion_chenille:play()
-					-- autre sens pour partie arriere
-		          
-		            chenille[numtouche].speed = 0
+		         	explosionChenille(new_x,new_y)
+				
+		            chenille[numtouche].speed =0
 		            -- event.target.speed = 0
 					
 				    timer.performWithDelay(10,function() newChampignon (numtouche,new_x,new_y) end ,1) 
@@ -202,13 +248,14 @@ local function chenilleCollision( event )
 		            display.remove ( event.target )
 		            event.target = nil
 					
-					mydata.score = mydata.score + 1
-					tb.text = mydata.score
+					mydata.levelScore = mydata.levelScore + 1
+					tb.text = mydata.levelScore
 
 					if nbtouche >= chenilleCount 
 						then
 						print ("GAGNE !!!!")
-						composer.gotoScene( "restart" )
+
+						composer.gotoScene( "nextlevel" )
 					end
 					return true
 		            
@@ -243,24 +290,9 @@ local function chenilleCollision( event )
  		 			--objet qui tombe
  		 			local b_x=event.other.x
  		 			local b_y=event.other.y
- 		 			local sens_x
- 		 			if event.target.speed >0 then sens_x=2
- 		 				else sens_x=-2
- 		 			end
- 		 			 timer.performWithDelay(1, function() 
-				 		 				bomb=display.newImageRect( "champignon.png" , 40, 40 )
-										bomb.gravityScale = 3
-										bomb.type="bomb"
-										bomb:setFillColor(0.9,0,0)
-										bomb.x = b_x
-				 		 				bomb.y= b_y 
-				 		 				physics.addBody( bomb, 'dynamic',{bounce=0.6,friction=0, filter = bombCollisionFilter})
-				 		 				bomb:applyForce(sens_x,2,bomb.x,bomb.y)
-				 		 				bomb.addEventListener('collision', bombCollision)
-			 		 				end,
-			 		 			 1)
-
- 		 			 display.remove(event.other)
+ 		 			local speedimpact=event.target.speed
+ 		 			timer.performWithDelay(1,function() createBomb(b_x,b_y,speedimpact) end,1)
+ 		 			display.remove(event.other)
  		 			event.other=nil
 
  		 	end
@@ -329,7 +361,7 @@ function scene:create( event )
    local sceneGroup = self.view
    
    gameStarted = false
-   mydata.score = 0
+  
 
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
@@ -337,6 +369,11 @@ function scene:create( event )
    local background = display.newImageRect("foret_bg.png",1600,3000)
 	sceneGroup:insert(background)
 
+    sol=display.newRect(0,display.viewableContentHeight,contentW*2,10)
+    -- sol.alpha=0
+    sol.type="sol"
+    physics.addBody(sol, "static", {filter = solCollisionFilter})
+    sceneGroup:insert(sol)
 	--vaisseau = display.newImageRect("avion.png",40,40)
 	vaisseau = display.newRect(contentW * 0.5,display.viewableContentHeight - 50,40,40)
 	vaisseau.type = "player"
@@ -372,9 +409,7 @@ function scene:create( event )
 		chenille[i].numero = i
 		chenille[i].speed = speed
 		chenille[i].type="ver"
-		
 	
-
 		physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
 		chenille[i].gravityScale = 0
 		chenille[i]:setLinearVelocity( -speed, 0 )
@@ -411,7 +446,7 @@ function scene:create( event )
 		sceneGroup:insert(champ[i])
 	end
 
-	tb = display.newText(mydata.score,display.contentCenterX,
+	tb = display.newText(mydata.levelScore,display.contentCenterX,
 	50, "pixelmix", 58)
 	tb:setFillColor(255,255,255)
 	tb.alpha = 1

@@ -2,8 +2,8 @@
 local aspectRatio = display.pixelHeight / display.pixelWidth
 local max_width = 800
 local max_height = 1200
---max_width=480
---max_height=520
+-- max_width=480
+-- max_height=520
 
 application = {
    content = {

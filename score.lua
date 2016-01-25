@@ -13,7 +13,7 @@ function M.init( options )
 	opt.y = customOptions.y or opt.fontSize * 0.5
 	opt.maxDigits = customOptions.maxDigits or 6
 	opt.leadingZeros = customOptions.leadingZeros or false
-	M.filename = customOptions.filename or "scorefile.txt"
+	--M.filename = customOptions.filename or "scorefile.txt"
 
 	local prefix = ""
 	if opt.leadingZeros then 
@@ -22,6 +22,7 @@ function M.init( options )
 	M.format = "%" .. prefix .. opt.maxDigits .. "d"
 
 	M.scoreText = display.newText(string.format(M.format, 0), opt.x, opt.y, opt.font, opt.fontSize)
+	
 	return M.scoreText
 end
 

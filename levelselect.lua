@@ -36,21 +36,24 @@ function scene:create( event )
     -- setup a page background, really not that important though composer
     -- crashes out if there isn't a display object in the view.
     --
-    local background = display.newRect( 0, 0, 570, 360)
+     local background = display.newImageRect("foret_bg.png",1600,3000)
+
     background.x = display.contentCenterX
     background.y = display.contentCenterY
-    sceneGroup:insert(background)
+    sceneGroup:insert( background )
+   
 
-    local selectLevelText = display.newText("Select a level", 125, 32, native.systemFontBold, 32)
+    local selectLevelText = display.newText("Select a level", 125, 32, native.systemFontBold, 64)
     selectLevelText:setFillColor( 0 )
-    selectLevelText.x = display.contentCenterX
-    selectLevelText.y = 50
+    selectLevelText.x = display.contentCenterX 
+    selectLevelText.y = 80
+    selectLevelText:setFillColor( 1 )
     sceneGroup:insert(selectLevelText)
 
     --local x = 90
     --local y = 115
-    local x = 0
-    local y = 0
+    local x = -80
+    local y = display.contentCenterY-200
     local buttons = {}
     local buttonBackgrounds = {}
     local buttonGroups = {}
@@ -58,7 +61,7 @@ function scene:create( event )
     local cnt = 1
     for i = 1, myData.maxLevels do
         buttonGroups[i] = display.newGroup()
-        buttonBackgrounds[i] = display.newRoundedRect( x, y, 42, 32, 8 )
+        buttonBackgrounds[i] = display.newRoundedRect( x, y,80, 50, 8 )
         buttonBackgrounds[i]:setFillColor( 1, 0, 1, 0.333 )
         buttonBackgrounds[i]:setStrokeColor( 1, 0, 1, 0.667 )
         buttonBackgrounds[i].strokeWidth = 1
@@ -79,12 +82,12 @@ function scene:create( event )
         buttons[i].y = y
         buttonGroups[i]:insert(buttons[i])
 
-        x = x + 55
+        x = x + 100
         cnt = cnt + 1
         if cnt > 5 then
             cnt = 1
-            x = 0
-            y = y + 42
+            x = -80
+            y = y + 80
         end
         levelSelectGroup:insert(buttonGroups[i])
     end
