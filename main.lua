@@ -16,8 +16,11 @@ if device.isAndroid then
     --store = require("plugin.google.iap.v3")
 end
 
+--suppression du du ficher stteings.json pour test
+local resetsettings=utility.deleteTable("settings.json")
 --
 -- Load saved in settings
+
 --
 myData.settings = utility.loadTable("settings.json")
 if myData.settings == nil then

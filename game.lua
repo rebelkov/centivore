@@ -11,6 +11,9 @@ local player = require("player")
 print ("curret level "..mydata.settings.currentLevel)
 print("speed "..mydata.settings.levels[mydata.settings.currentLevel].speed)
 local speed = mydata.settings.levels[mydata.settings.currentLevel].speed
+local chenilleCount = mydata.settings.levels[mydata.settings.currentLevel].chenilleCount
+local champignonCount = mydata.settings.levels[mydata.settings.currentLevel].champignonCount
+
 local motionx = -1
 local contentW, contentH = display.contentWidth, display.contentHeight
 local bullet
@@ -28,11 +31,10 @@ local solCollisionFilter = {categoryBits=64, maskBits= 32 } -- collision avec bo
 local chenille = {}
 local champignon ={}
 local champ={}
-local chenilleCount = 10
-local champignonCount = 20
+
 local chenilleHeight = 15
 local color1 = { 1, 0, 0.5 }
-local nbtouche = 0
+local nbtouche = mydata.levelScore
 local bomb
 local explosionOptions =		{
 							    width = 64,
@@ -217,19 +219,18 @@ local function chenilleCollision( event )
 						 		 						end
 
 						 		 				end
-						 		 				event.target:setLinearVelocity(event.target.speed, 0 )
-		 		 								event.target.speed = - event.target.speed
 					 		 				end,
 					 		 			 1)
 						
-		 		 
+		 		 event.target:setLinearVelocity(event.target.speed, 0 )
+		 		 event.target.speed = - event.target.speed
 		 		 return true
 		 		
 			end
 			
 			
 
-		    if event.other.type == 'bullet' then
+		    if event.other.type == 'bullet' and chenille[event.target.numero].alpha == 1 then
 		        	local numtouche=event.target.numero
 		            local new_x=event.target.x
 			  		local new_y=event.target.y
@@ -276,7 +277,9 @@ local function chenilleCollision( event )
 			
     	 end   
 
-    	  	
+    	  if event.other.type == "wall"  and event.target.type == "ver"  and  event.target.y > 150 then
+    	  		chenille[event.target.numero].alpha = 1
+    	  end	
 		 		
 
  		 if event.other.type == "champ" then
@@ -368,9 +371,7 @@ function scene:create( event )
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
    
-   local background = display.newImageRect("foret_bg.png",800,1500)
-    background.x = display.contentCenterX
-    background.y = display.contentCenterY
+   local background = display.newImageRect("foret_bg.png",1600,3000)
 	sceneGroup:insert(background)
 
     sol=display.newRect(0,display.viewableContentHeight,contentW*2,10)
@@ -405,9 +406,14 @@ function scene:create( event )
 	sceneGroup:insert(mur_d) 
    
 
+
 	for i = 1, chenilleCount do
 	
-		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, 150,  chenilleHeight )
+		
+		local numpassage=math.floor(i / 10 )
+		print ("numpassage.."..i.. " "..numpassage)
+		local start_y = 200 - ( numpassage *200 )
+		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, start_y,  chenilleHeight )
 		
 		
 		chenille[i].numero = i
@@ -417,6 +423,7 @@ function scene:create( event )
 		physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
 		chenille[i].gravityScale = 0
 		chenille[i]:setLinearVelocity( -speed, 0 )
+		chenille[i].alpha = 0
 		sceneGroup:insert(chenille[i]) 
 
 		--creation des objets chamigong cache en reserve
@@ -488,7 +495,7 @@ function scene:show( event )
 			--chenille[i]:addEventListener( 'postCollision', afterCollision )
 		end
 
-		for i = 1, champignonCount do
+		for i = 1, #champ do
 			champ[i]:addEventListener( 'collision', champCollision )
 		end
 	--Runtime.addEventListener( 'collision', wallCollision )
@@ -508,6 +515,8 @@ function scene:hide( event )
       -- Insert code here to "pause" the scene.
       -- Example: stop timers, stop animation, stop audio, etc.
 
+		
+
 		if vaisseau.width ~= nil then
 			vaisseau:removeEventListener( 'touch', shoot )
 		end
@@ -516,15 +525,6 @@ function scene:hide( event )
 			if chenille[i].speed ~= 0  then
 				chenille[i]:removeEventListener( 'collision', chenilleCollision )
 			end
-			-- if champignon[i].type ~= nil then
-			-- 	champignon[i]:removeEventListener( 'collision', champCollision )
-			-- end
-
-		end
-		for i = 1, champignonCount do
-				if champ[i].type ~= nil then 
-					champ[i]:removeEventListener( 'collision', champCollision )
-				end
 		end
 	  
    elseif ( phase == "did" ) then
