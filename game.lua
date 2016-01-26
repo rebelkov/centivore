@@ -210,12 +210,13 @@ local function chenilleCollision( event )
     		--print(event.other.type)
     			  
 			if event.other.type == 'wall' or event.other.type=="champ" then
-		 		 	
+		 		 print (event.other.type.." collision chenille no "..event.target.numero.." pos y  "..event.target.y)
 		 		 timer.performWithDelay(1, function() 
 						 		 				if event.target.y~=nil and vaisseau.y ~= nil then
 						 		 						event.target.y=event.target.y + chenilleHeight*2.5 
 						 		 						if event.target.y > vaisseau.y + chenilleHeight*2.5 then 
 						 		 							event.target.y = vaisseau.y
+						 		 							print ("suite collision chenille no "..event.target.numero.." event.target.y")
 						 		 						end
 
 						 		 				end
@@ -250,14 +251,19 @@ local function chenilleCollision( event )
 		            
 		            display.remove ( event.target )
 		            event.target = nil
+		             chenille[numtouche] = nil
 					
 					mydata.levelScore = mydata.levelScore + 1
 					tb.text = mydata.levelScore
 
+local test= chenilleCount - 2
+if nbtouche >= test then
+   if (chenille) then print ("reste "..#chenille) end
+end
 					if nbtouche >= chenilleCount 
 						then
 						print ("GAGNE !!!!")
-
+						print ("reste "..#chenille)
 						composer.gotoScene( "nextlevel" )
 					end
 					return true
@@ -393,14 +399,14 @@ function scene:create( event )
 	backplayer.alpha=0
 	sceneGroup:insert(backplayer)
 
-	mur_g = display.newRect( 10, 0, 50, 3000)
+	mur_g = display.newRect( -40, -200,100, 3000)
 	physics.addBody( mur_g, "static",{  filter=murCollisionFilter })
  	mur_g.type="wall"
  	
 
 	sceneGroup:insert(mur_g) 
 
-	mur_d = display.newRect( contentW-10,0, 50, 3000)
+	mur_d = display.newRect( contentW-10,-200, 50, 3000)
 	physics.addBody( mur_d, "static",{ filter=murCollisionFilter })
 	 mur_d.type="wall"
 	sceneGroup:insert(mur_d) 
@@ -411,9 +417,10 @@ function scene:create( event )
 	
 		
 		local numpassage=math.floor(i / 10 )
-		print ("numpassage.."..i.. " "..numpassage)
 		local start_y = 200 - ( numpassage *200 )
-		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, start_y,  chenilleHeight )
+		local pos_x = i % 11
+		print ("creation chenille "..i.." lot "..numpassage.." sur position x "..pos_x.." en y "..start_y)
+		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*pos_x)+1, start_y,  chenilleHeight )
 		
 		
 		chenille[i].numero = i
@@ -423,13 +430,13 @@ function scene:create( event )
 		physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
 		chenille[i].gravityScale = 0
 		chenille[i]:setLinearVelocity( -speed, 0 )
-		chenille[i].alpha = 0
+		chenille[i].alpha = 1
 		sceneGroup:insert(chenille[i]) 
 
 		--creation des objets chamigong cache en reserve
 	 champignon[i] = display.newImageRect( "champignon.png" , 40, 40 )
 		champignon[i].x = 0
-		champignon[i].y = 0
+		champignon[i].y = 2500
 		champignon[i]:setFillColor( 0.9, 0.1, 0.16  )
 	--champignon[i] =display.newRect( 0,0 , 20, 20 )
 	    champignon[i].pv = 1 
@@ -522,7 +529,7 @@ function scene:hide( event )
 		end
 		Runtime:removeEventListener( 'tap', shoot )
 		for i = 1, #chenille do
-			if chenille[i].speed ~= 0  then
+			if (chenille[i])   then
 				chenille[i]:removeEventListener( 'collision', chenilleCollision )
 			end
 		end

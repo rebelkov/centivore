@@ -26,6 +26,7 @@ function scene:create( event )
     params = event.params
         
     myData.settings.currentLevel = myData.settings.currentLevel + 1
+    myData.levelScore = 0
     utility.saveTable(myData.settings, "settings.json")
     --
     -- setup a page background, really not that important though composer
