@@ -8,9 +8,9 @@ physics.start()
 --physics.setDrawMode( 'debug' )
 
 local player = require("player")
-print ("curret lee "..mydata.settings.currentLevel)
---print("level "..mydata.settings.levels[1][1].speed)
-local speed = 400
+print ("curret level "..mydata.settings.currentLevel)
+print("speed "..mydata.settings.levels[mydata.settings.currentLevel].speed)
+local speed = mydata.settings.levels[mydata.settings.currentLevel].speed
 local motionx = -1
 local contentW, contentH = display.contentWidth, display.contentHeight
 local bullet
@@ -28,7 +28,7 @@ local solCollisionFilter = {categoryBits=64, maskBits= 32 } -- collision avec bo
 local chenille = {}
 local champignon ={}
 local champ={}
-local chenilleCount = 10
+local chenilleCount = 20
 local chenilleHeight = 15
 local color1 = { 1, 0, 0.5 }
 local nbtouche = mydata.levelScore
@@ -227,7 +227,7 @@ local function chenilleCollision( event )
 			
 			
 
-		    if event.other.type == 'bullet' then
+		    if event.other.type == 'bullet' and chenille[event.target.numero].alpha == 1 then
 		        	local numtouche=event.target.numero
 		            local new_x=event.target.x
 			  		local new_y=event.target.y
@@ -274,7 +274,9 @@ local function chenilleCollision( event )
 			
     	 end   
 
-    	  	
+    	  if event.other.type == "wall"  and event.target.type == "ver"  and  event.target.y > 150 then
+    	  		chenille[event.target.numero].alpha = 1
+    	  end	
 		 		
 
  		 if event.other.type == "champ" then
@@ -401,9 +403,14 @@ function scene:create( event )
 	sceneGroup:insert(mur_d) 
    
 
+
 	for i = 1, chenilleCount do
 	
-		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, 150,  chenilleHeight )
+		
+		local numpassage=math.floor(i / 10 )
+		print ("numpassage.."..i.. " "..numpassage)
+		local start_y = 200 - ( numpassage *200 )
+		chenille[i] = display.newCircle( contentW / 4 + (chenilleHeight*2.1*i)+1, start_y,  chenilleHeight )
 		
 		
 		chenille[i].numero = i
@@ -413,6 +420,7 @@ function scene:create( event )
 		physics.addBody( chenille[i] , "dynamic",{filter=verCollisionFilter})
 		chenille[i].gravityScale = 0
 		chenille[i]:setLinearVelocity( -speed, 0 )
+		chenille[i].alpha = 0
 		sceneGroup:insert(chenille[i]) 
 
 		--creation des objets chamigong cache en reserve
