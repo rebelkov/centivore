@@ -8,9 +8,9 @@ physics.start()
 --physics.setDrawMode( 'debug' )
 
 local player = require("player")
-print ("curret lee "..mydata.settings.currentLevel)
---print("level "..mydata.settings.levels[1][1].speed)
-local speed = 400
+print ("curret level "..mydata.settings.currentLevel)
+print("speed "..mydata.settings.levels[mydata.settings.currentLevel].speed)
+local speed = mydata.settings.levels[mydata.settings.currentLevel].speed
 local motionx = -1
 local contentW, contentH = display.contentWidth, display.contentHeight
 local bullet
@@ -29,9 +29,10 @@ local chenille = {}
 local champignon ={}
 local champ={}
 local chenilleCount = 10
+local champignonCount = 20
 local chenilleHeight = 15
 local color1 = { 1, 0, 0.5 }
-local nbtouche = mydata.levelScore
+local nbtouche = 0
 local bomb
 local explosionOptions =		{
 							    width = 64,
@@ -216,11 +217,12 @@ local function chenilleCollision( event )
 						 		 						end
 
 						 		 				end
+						 		 				event.target:setLinearVelocity(event.target.speed, 0 )
+		 		 								event.target.speed = - event.target.speed
 					 		 				end,
 					 		 			 1)
 						
-		 		 event.target:setLinearVelocity(event.target.speed, 0 )
-		 		 event.target.speed = - event.target.speed
+		 		 
 		 		 return true
 		 		
 			end
@@ -366,7 +368,9 @@ function scene:create( event )
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
    
-   local background = display.newImageRect("foret_bg.png",1600,3000)
+   local background = display.newImageRect("foret_bg.png",800,1500)
+    background.x = display.contentCenterX
+    background.y = display.contentCenterY
 	sceneGroup:insert(background)
 
     sol=display.newRect(0,display.viewableContentHeight,contentW*2,10)
@@ -431,7 +435,7 @@ function scene:create( event )
 	end
 
 
-	for i = 1, 20 do
+	for i = 1, champignonCount do
 		champ[i] = display.newImageRect( "champignon.png" , 40, 40 )
 		
 		local random_x = math.random(100,contentW-100)
@@ -484,7 +488,7 @@ function scene:show( event )
 			--chenille[i]:addEventListener( 'postCollision', afterCollision )
 		end
 
-		for i = 1, 20 do
+		for i = 1, champignonCount do
 			champ[i]:addEventListener( 'collision', champCollision )
 		end
 	--Runtime.addEventListener( 'collision', wallCollision )
@@ -504,8 +508,6 @@ function scene:hide( event )
       -- Insert code here to "pause" the scene.
       -- Example: stop timers, stop animation, stop audio, etc.
 
-		
-
 		if vaisseau.width ~= nil then
 			vaisseau:removeEventListener( 'touch', shoot )
 		end
@@ -514,6 +516,15 @@ function scene:hide( event )
 			if chenille[i].speed ~= 0  then
 				chenille[i]:removeEventListener( 'collision', chenilleCollision )
 			end
+			-- if champignon[i].type ~= nil then
+			-- 	champignon[i]:removeEventListener( 'collision', champCollision )
+			-- end
+
+		end
+		for i = 1, champignonCount do
+				if champ[i].type ~= nil then 
+					champ[i]:removeEventListener( 'collision', champCollision )
+				end
 		end
 	  
    elseif ( phase == "did" ) then

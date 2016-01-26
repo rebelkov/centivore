@@ -28,7 +28,10 @@ if myData.settings == nil then
 	myData.settings.currentLevel = 1
 	myData.settings.unlockedLevels = 20
     myData.settings.bestScore = 0
-	--myData.settings.levels = {}
+	M.settings.levels = {
+        {numlevel=1,speed=200,chenilleCount=10,champignonCount = 20},
+        {numlevel=2,speed=400,chenilleCount=10,champignonCount = 20}
+    } 
 	utility.saveTable(myData.settings, "settings.json")
 end
 if myData.settings.bestScore == nil then
