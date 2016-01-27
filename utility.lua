@@ -86,6 +86,18 @@ function M.loadTable(filename)
     return nil
 end
 
+function M.deleteTable(filename)
+    local path = system.pathForFile(filename, system.DocumentsDirectory )
+    local file = io.open( path, "w+b" ) 
+    if file  then
+            io.close( file )
+            os.remove (path)
+            return true
+    end             
+    print (filename, " not delete")
+    return nil     
+end
+
 function M.ignoreTouch(event)
     print("throwing away background touch")
     return true

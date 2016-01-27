@@ -16,8 +16,11 @@ if device.isAndroid then
     --store = require("plugin.google.iap.v3")
 end
 
+--suppression du du ficher stteings.json pour test
+local resetsettings=utility.deleteTable("settings.json")
 --
 -- Load saved in settings
+
 --
 myData.settings = utility.loadTable("settings.json")
 if myData.settings == nil then
@@ -29,9 +32,9 @@ if myData.settings == nil then
 	myData.settings.unlockedLevels = 20
     myData.settings.bestScore = 0
 	M.settings.levels = {
-                            {numlevel=1,speed=200},
-                            {numlevel=2,speed=400}
-                        } 
+        {numlevel=1,speed=200,chenilleCount=10,champignonCount = 20},
+        {numlevel=2,speed=400,chenilleCount=10,champignonCount = 20}
+    } 
 	utility.saveTable(myData.settings, "settings.json")
 end
 if myData.settings.bestScore == nil then

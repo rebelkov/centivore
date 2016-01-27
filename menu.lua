@@ -65,6 +65,7 @@ function scene:create( event )
     local playButton = widget.newButton({
         id = "button1",
         label = "Jouer",
+        labelColor = { default={1,1,0}, over={0,0,0,0.5}},
         width = 200,
         height = 64,
         font= native.systemFontBold,
