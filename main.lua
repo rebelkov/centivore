@@ -29,12 +29,13 @@ if myData.settings == nil then
 	myData.settings.musicOn = true
     myData.settings.isPaid = false
 	myData.settings.currentLevel = 1
-	myData.settings.unlockedLevels = 20
+	myData.settings.unlockedLevels = 1
     myData.settings.bestScore = 0
 	M.settings.levels = {
         {numlevel=1,speed=200,chenilleCount=10,champignonCount = 20,pvBomb=8},
         {numlevel=2,speed=300,chenilleCount=20,champignonCount = 20,pvBomb=5},
-        {numlevel=2,speed=400,chenilleCount=20,champignonCount = 20,pvBomb=2}
+        {numlevel=3,speed=400,chenilleCount=20,champignonCount = 20,pvBomb=2},
+        {numlevel=4,speed=400,chenilleCount=20,champignonCount = 20,pvBomb=2}
     } 
 	utility.saveTable(myData.settings, "settings.json")
 end

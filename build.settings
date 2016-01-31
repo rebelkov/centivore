@@ -21,34 +21,34 @@ settings =
     plugins =
     {
         -- key is the name passed to Lua's 'require()'
-        ["plugin.google.iap.v3"] =
-        {
+       -- ["plugin.google.iap.v3"] =
+       --{
             -- required
-            publisherId = "com.coronalabs",
-            supportedPlatforms = { android = true },
-        },
+       --     publisherId = "com.coronalabs",
+        --   supportedPlatforms = { android = true },
+       -- },
         -- key is the name passed to Lua's 'require()'
-        ["CoronaProvider.native.popup.social"] =
-        {
+       --- ["CoronaProvider.native.popup.social"] =
+       -- {
             -- required
-            publisherId = "com.coronalabs",
-        },
-        ["plugin.google.play.services"] =
-        {
-                publisherId = "com.coronalabs",
-                supportedPlatforms = { android=true }
-        },
+       --     publisherId = "com.coronalabs",
+       -- },
+       -- ["plugin.google.play.services"] =
+       -- {
+       --         publisherId = "com.coronalabs",
+        --        supportedPlatforms = { android=true }
+       -- },
         -- Google play game services
-        ["CoronaProvider.gameNetwork.google"] =
-        {
-            publisherId = "com.coronalabs",
-            supportedPlatforms = { android=true },
-        },
-        ["CoronaProvider.gameNetwork.apple"] =
-        {
-            publisherId = "com.coronalabs",
-            supportedPlatforms = { iphone=true, ["iphone-sim"]=true },
-        },
+       -- ["CoronaProvider.gameNetwork.google"] =
+       -- {
+       --     publisherId = "com.coronalabs",
+       --     supportedPlatforms = { android=true },
+       -- },
+       -- ["CoronaProvider.gameNetwork.apple"] =
+       -- {
+        --    publisherId = "com.coronalabs",
+        --    supportedPlatforms = { iphone=true, ["iphone-sim"]=true },
+        --},
     },
     iphone =
     {

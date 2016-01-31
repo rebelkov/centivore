@@ -43,7 +43,7 @@ function scene:create( event )
     sceneGroup:insert( background )
    
 
-    local selectLevelText = display.newText("Select a level", 125, 32, native.systemFontBold, 64)
+    local selectLevelText = display.newText("Choix du niveau ", 125, 32, native.systemFontBold, 64)
     selectLevelText:setFillColor( 0 )
     selectLevelText.x = display.contentCenterX 
     selectLevelText.y = 80
@@ -68,11 +68,11 @@ function scene:create( event )
         buttonGroups[i]:insert(buttonBackgrounds[i])
         buttonGroups[i].id = i
         if myData.settings.unlockedLevels == nil then
-            myData.settings.unlockedLevels = 10
+            myData.settings.unlockedLevels = 1
         end
         
         if i <= myData.settings.unlockedLevels then
-            buttonGroups[i].alpha = 1.0
+            buttonGroups[i].alpha = 1
             buttonGroups[i]:addEventListener( "touch", handleLevelSelect )
         else
             buttonGroups[i].alpha = 0.5
@@ -97,13 +97,11 @@ function scene:create( event )
 
     local doneButton = widget.newButton({
         id = "button1",
-        label = "Done",
-        width = 100,
-        height = 32,
+         defaultFile = "back.png",
         onEvent = handleButtonEvent
     })
     doneButton.x = display.contentCenterX
-    doneButton.y = display.contentHeight - 40
+    doneButton.y = display.contentHeight - 60
     sceneGroup:insert( doneButton )
 end
 

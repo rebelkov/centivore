@@ -64,12 +64,7 @@ function scene:create( event )
     -- Create the widget
     local playButton = widget.newButton({
         id = "button1",
-        label = "Jouer",
-        labelColor = { default={1,1,0}, over={0,0,0,0.5}},
-        width = 200,
-        height = 64,
-        font= native.systemFontBold,
-        fontSize= 48,
+        defaultFile = "jouer.png",
         onEvent = handlePlayButtonEvent
     })
     playButton.x = display.contentCenterX
@@ -79,11 +74,7 @@ function scene:create( event )
     -- Create the widget
     local settingsButton = widget.newButton({
         id = "button2",
-        label = "Paramètres",
-        width = 100,
-        height = 64,
-           font= native.systemFontBold,
-        fontSize= 48,
+        defaultFile = "options.png",
         onEvent = handleSettingsButtonEvent
     })
     settingsButton.x = display.contentCenterX
@@ -93,11 +84,7 @@ function scene:create( event )
     -- Create the widget
     local helpButton = widget.newButton({
         id = "button3",
-        label = "Aide",
-        width = 100,
-        height = 64,
-         font= native.systemFontBold,
-        fontSize= 48,
+        defaultFile = "aide.png",
         onEvent = handleHelpButtonEvent
     })
     helpButton.x = display.contentCenterX
@@ -107,11 +94,7 @@ function scene:create( event )
     -- Create the widget
     local creditsButton = widget.newButton({
         id = "button4",
-        label = "Credits",
-        width = 100,
-        height = 64,
-         font= native.systemFontBold,
-        fontSize= 48,
+       defaultFile = "credits.png",
         onEvent = handleCreditsButtonEvent
     })
     creditsButton.x = display.contentCenterX

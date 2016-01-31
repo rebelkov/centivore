@@ -26,18 +26,21 @@ function scene:create( event )
     params = event.params
         
     myData.settings.currentLevel = myData.settings.currentLevel + 1
+    if myData.settings.currentLevel > myData.settings.unlockedLevels then
+        myData.settings.unlockedLevels = myData.settings.currentLevel
+    end
     myData.levelScore = 0
     utility.saveTable(myData.settings, "settings.json")
     --
     -- setup a page background, really not that important though composer
     -- crashes out if there isn't a display object in the view.
     --
-    local background = display.newRect( 0, 0, 570, 360 )
-    background.x = display.contentCenterX
+    local background = display.newImageRect("foret_bg.png",900,1500)
+     background.x = display.contentCenterX
     background.y = display.contentCenterY
-    sceneGroup:insert(background)
+    sceneGroup:insert( background )
 
-    local wooHooOptions = { text = "Woo hoo!", fontSize = 42, font = native.systemFontBold, align = "center"}
+    local wooHooOptions = { text = "Yahouu !", fontSize = 42, font = native.systemFontBold, align = "center"}
 
     local wooHooText = display.newText( wooHooOptions )
     wooHooText.x = display.contentCenterX 
@@ -46,20 +49,18 @@ function scene:create( event )
     sceneGroup:insert(wooHooText)
 
 
-    nextLevelText = display.newText("Next Level " .. myData.settings.currentLevel, display.contentCenterX, display.contentCenterY, native.systemFontBold, 48)
-    nextLevelText:setFillColor( 0 )
+    nextLevelText = display.newText("Vers niveau " .. myData.settings.currentLevel, display.contentCenterX, display.contentCenterY, native.systemFontBold, 48)
+    nextLevelText:setFillColor(1 )
     sceneGroup:insert(nextLevelText)
 
     -- Create the widget
     local doneButton = widget.newButton({
         id = "button1",
-        label = "Next level",
-        width = 100,
-        height = 32,
+        defaultFile = "next.png",
         onEvent = handleButtonEvent
     })
     doneButton.x = display.contentCenterX 
-    doneButton.y = display.contentHeight - 40
+    doneButton.y = display.contentHeight - 60
     sceneGroup:insert( doneButton )
 
 end

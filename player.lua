@@ -6,14 +6,14 @@ local function player_explosion(event)
 							{
 							    width = 125,
 							    height = 125,
-							    numFrames = 14
+							    numFrames = 16
 							}
 	local sheet_explosion = graphics.newImageSheet( "explosion_player.png", sheetOptions )
 	local sequences_explosion ={
 													{
 											        name = "normalExplosion",
 											        start = 1,
-											        count = 14,
+											        count = 16,
 											        time = 800,
 											        loopCount=1
 											        
